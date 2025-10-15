@@ -1,48 +1,31 @@
 DELIMITER //
 
-CREATE OR REPLACE TRIGGER t_limitar_importe_pedidos_de_menores BEFORE INSERT ON LineasPedido
+CREATE OR REPLACE  TRIGGER  t_asegurar_mismo_tipo_producto_en_pedidos
+BEFORE INSERT ON lineaspedido
 FOR EACH ROW
 BEGIN
-    DECLARE clienteId INT DEFAULT NULL;
-    DECLARE añosCliente INT ;
-    DECLARE limitePrecio INT DEFAULT 500;
-    DECLARE precioTotal INT ;
-    DECLARE mensajeError TEXT;
+    DECLARE v_tipo_nuevo INT;
+    DECLARE v_existe_diferente BOOLEAN DEFAULT FALSE;
 
-    -- Obtener el cliente asociado al pedido
-    SELECT p.clienteId INTO clienteId
-    FROM Pedidos p
-    WHERE p.id = NEW.pedidoId;
+    -- Obtener el tipo del nuevo producto
+    SELECT tipoProductoId INTO v_tipo_nuevo
+    FROM productos
+    WHERE id = NEW.productoId;
 
-    -- Validar si el cliente asociado al pedido existe
-    IF clienteId IS NULL THEN
+    -- Verificar si hay algún producto de tipo distinto en el mismo pedido
+    SELECT EXISTS (
+        SELECT 1
+        FROM lineaspedido lp
+        JOIN productos p ON lp.productoId = p.id
+        WHERE lp.pedidoId = NEW.pedidoId
+          AND p.tipoProductoId != v_tipo_nuevo
+    ) INTO v_existe_diferente;
+
+    IF v_existe_diferente THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'El pedido no está asociado a un cliente válido.';
+        SET MESSAGE_TEXT = 'Un mismo pedido no puede contener productos físicos y digitales.';
     END IF;
-    
-    -- Obtener la edad del cliente asociado al pedido
-    
-    SELECT TIMESTAMPDIFF(YEAR,clientes.fechaNacimiento,CURDATE()) INTO añosCliente
-    FROM clientes
-    WHERE clientes.id=clienteId;
-    
-    SELECT COALESCE(SUM(lp.unidades * lp.precio), 0) INTO precioTotal
-    FROM  lineaspedido lp
-    WHERE lp.pedidoId = NEW.pedidoId;
-    
-    SET precioTotal=precioTotal+(NEW.unidades*NEW.precio);
-
-    -- Verificar si la cantidad total supera el límite
-    IF añosCliente < 18 THEN
-    	IF  precioTotal> limitePrecio THEN
-    
-        SET mensajeError = CONCAT('El pedido excede el límite de ', CAST(limitePrecio AS CHAR), ' precio permitido para clientes menores de edad.');
-        SIGNAL SQLSTATE '45000'
-     
-	     SET MESSAGE_TEXT = mensajeError;
-	     END IF;
-    END IF;
-END //
+END//
 
 DELIMITER ;
 

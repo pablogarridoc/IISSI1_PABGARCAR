@@ -1,78 +1,44 @@
  DELIMITER //
 
-CREATE PROCEDURE r(
-  IN p_nombre VARCHAR(255),
-  IN p_descripción TEXT,
-  IN p_precio DECIMAL(10, 2),
-  IN p_tipoProductoId INT,
-  IN p_puedeVenderseAMenores BOOLEAN,
-  IN p_regalo BOOLEAN
-  
+CREATE PROCEDURE actualizar_precio_producto(
+  IN p_productoId INT,
+  IN p_precioNuevo DECIMAL(10, 2)
 )
 BEGIN
-  DECLARE v_productoId INT;
-  DECLARE v_pedidoId INT;
-  DECLARE v_lineaspedidoId INT;
-  DECLARE v_clienteId INT;#CLIENTE MAS ANTIGUO
-  DECLARE v_direccionEntrega VARCHAR(255);
-  DECLARE v_empleadoId INT;
+  DECLARE v_precioProducto DECIMAL(10, 2);
+  
 
   -- Manejo de errores
   DECLARE EXIT HANDLER FOR SQLEXCEPTION
   BEGIN
       ROLLBACK;
-      SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error al registrar el nuevo producto';
+      SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error al actualizar el precio del producto';
   END;
 
   -- Iniciar transacción
   START TRANSACTION;
 
+  -- Averiguar el precio del producto dado
+  SELECT productos.precio
+  INTO v_precioProducto
+  FROM productos 
+  WHERE productos.id=p_productoId;
 
-  IF p_regalo IS TRUE THEN
-      if p_precio>50 then 
-			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No se permite crear un producto para regalo de más de 50€.'; 
-		 END IF;
+  IF p_precioNuevo<v_precioProducto*0.5 THEN
+      SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No se permite rebajar el precio m·s del 50%.';
   END IF;
+
+  -- Actualiza el precio del producto 
+  UPDATE productos SET productos.precio=p_precioNuevo WHERE productos.id=p_productoId;
   
+  -- Actualiza las lineas de pedido que contengan ese producto
+  UPDATE lineaspedido 
+  JOIN pedidos ON pedidos.id=lineaspedido.id
+  SET lineaspedido.precio=p_precioNuevo 
+  WHERE lineaspedido.productoId=p_productoId
+  AND pedidos.fechaEnvio IS NULL;
+
   
-  INSERT INTO productos(nombre,descripción,precio,tipoProductoId,puedeVenderseAMenores)
-  VALUES(p_nombre,p_descripción,p_precio,p_tipoProductoId,p_puedeVenderseAMenores);
-   
-  SET v_productoId = LAST_INSERT_ID();
-  
-  #Consultamos el id del cliente mas antiguo
-  
-  SELECT clientes.id INTO v_clienteId
-  FROM pedidos JOIN clientes ON pedidos.clienteId=clientes.id
-  GROUP BY clientes.id
-  ORDER BY pedidos.fechaRealizacion ASC
-  LIMIT 1;
-  
-  #Consultamos la direcion del cliente mas antiguo 
-  SELECT pedidos.direccionEntrega INTO v_direccionEntrega
-  FROM pedidos JOIN clientes ON clientes.id=pedidos.clienteId
-  GROUP BY clientes.id
-  HAVING clientes.id=v_clienteId;
-  
-  #cogemos un id random de trabajador
-  SELECT empleados.id INTO v_empleadoId
-  FROM empleados 
-  GROUP BY empleados.id
-  LIMIT 1;
-  
-  
-  
-	IF p_regalo IS TRUE THEN
-  		INSERT INTO pedidos(fechaRealizacion ,fechaEnvio,direccionEntrega,comentarios,clienteId,empleadoId)
-  		VALUES(CURDATE(),CURDATE(),v_direccionEntrega,'Que disfrute su regalo',v_clienteId,v_empleadoId);
-  		
-  		SET v_pedidoId = LAST_INSERT_ID();
-  		
-  		INSERT INTO lineaspedido(pedidoId,productoId,unidades,precio)
-  		VALUES(v_pedidoId,v_productoId,1,0);
-  		
-  		SET v_lineaspedidoId = LAST_INSERT_ID();
-  END IF;
 
   -- Confirmar transacción
   COMMIT;

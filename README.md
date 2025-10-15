@@ -1,4 +1,4 @@
-# Enunciado Evaluación Individual de Laboratorio - Modelo B
+# Enunciado Evaluación Individual de Laboratorio - Modelo A
 **Si usted entrega sin haber sido verificada su identidad no podrá ser evaluado.**
 
 ## Tienda Online
@@ -15,36 +15,37 @@ Realice los siguientes ejercicios:
 
 Incluya su solución en el fichero `1.solucionCreacionTabla.sql`.
 
+Necesitamos conocer la garantía de nuestros productos. Para ello se propone la creación de una nueva tabla llamada `Garantias`. Cada producto tendrá como máximo una garantía (no todos los productos tienen garantía), y cada garantía estará relacionada con un producto.
 
-Necesitamos conocer los pagos que se realicen sobre los pedidos. Para ello se propone la creación de una nueva tabla llamada `Pagos`. Cada pedido podrá tener asociado varios pagos y cada pago solo corresponde con un pedido en concreto.
+Para cada garantía necesitamos conocer la fecha de inicio de la garantía, la fecha de fin de la garantía, si tiene garantía extendida o no.
 
-Para cada pago necesitamos conocer la fecha de pago, la cantidad pagada (que no puede ser negativa) y si el pago ha sido revisado o no (por defecto no estará revisado).
+Asegure que la fecha de fin de la garantía es posterior a la fecha de inicio.
 
-### 2. Consultas SQL (DQL). 3 puntos
+### 2. Consultas SQL (DQL). (3 puntos)
 
 Incluya su solución en el fichero `2.solucionConsultas.sql`.
 
-#### 2.1. Devuelva el nombre del del empleado, la fecha de realización del pedido y el nombre del cliente de todos los pedidos realizados este mes. (1 puntos)
+#### 2.1. Devuelva el nombre del producto, nombre del tipo de producto, y precio unitario al que se vendieron los productos digitales (1 punto)
 
-#### 2.2. Devuelva el nombre, las unidades totales pedidas y el importe total gastado de aquellos clientes que han realizado más de 5 pedidos en el último año. (2 puntos)
+#### 2.2. Consulta que devuelva el nombre del empleado, el número de pedidos de más de 500 euros gestionados en este año y el importe total de cada uno de ellos, ordenados de mayor a menor importe gestionado. Los empleados que no hayan gestionado ningún pedido, también deben aparecer. (2 puntos)
 
-### 3. Procedimiento. 3,5 puntos
+### 3. Procedimiento. Actualizar precio de un producto y líneas de pedido no enviadas. (3,5 puntos)
 
 Incluya su solución en el fichero `3.solucionProcedimiento.sql`.
 
-Cree un procedimiento que permita crear un nuevo producto con posibilidad de que sea para regalo. Si el producto está destinado a regalo se creará un pedido con ese producto y costes 0€ para el cliente más antiguo. (1,5 puntos)
+Cree un procedimiento que permita actualizar el precio de un producto dado y que modifique los precios de las líneas de pedido asociadas al producto dado solo en aquellos pedidos que aún no hayan sido enviados. (1,5 puntos)
 
-Asegure que el precio del producto para regalo no debe superar los 50 euros y lance excepción si se da el caso con el siguiente mensaje: (1 punto)
+Asegure que el nuevo precio no sea un 50% menor que el precio actual y lance excepción si se da el caso con el siguiente mensaje: (1 punto)
 
-`No se permite crear un producto para regalo de más de 50€`.
+`No se permite rebajar el precio más del 50%`.
 
 Garantice que o bien se realizan todas las operaciones o bien no se realice ninguna. (1 punto)
 
-### 4. Trigger. 2 puntos
+### 4. Trigger. 2 puntos.
 
 Incluya su solución en el fichero `4.solucionTrigger.sql`.
 
-Cree un trigger llamado `t_limitar_importe_pedidos_de_menores` que impida que, a partir de ahora, los pedidos realizados por menores superen los 500€.
+Cree un trigger llamado `t_asegurar_mismo_tipo_producto_en_pedidos` que impida que, a partir de ahora, un mismo pedido incluya productos físicos y digitales.
 
 ## Procedimiento de entrega:
 

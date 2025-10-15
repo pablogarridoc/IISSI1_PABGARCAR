@@ -1,10 +1,12 @@
-DROP TABLE IF EXISTS Pagos;
+DROP TABLE IF EXISTS Garantias;
 
-CREATE TABLE Pagos (
+CREATE TABLE Garantias (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    pedidoId INT NOT NULL,
-    fechaPago DATE NOT NULL,
-    cantidadPago DECIMAL(10, 2) NOT NULL CHECK (cantidadPago>0),
-    revisado BOOL NOT NULL DEFAULT FALSE,
-    FOREIGN KEY (pedidoId) REFERENCES Pedidos(id)
+    productoId INT NOT NULL ,
+    fechaInicio DATE NOT NULL,
+    fechFin DATE NOT NULL CHECK 
+	 (fechFin>fechaInicio),
+    garantiaExtendida BOOLEAN NOT NULL,
+    FOREIGN KEY (productoId) REFERENCES Productos(id),
+    UNIQUE(id,productoId)
 );
