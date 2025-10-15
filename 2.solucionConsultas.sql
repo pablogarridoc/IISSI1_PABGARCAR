@@ -1,15 +1,20 @@
--- 2.1
-SELECT prd.nombre, prd.precio, lp.unidades
-FROM lineaspedido lp
-JOIN productos prd ON prd.id=lp.productoId
-ORDER BY lp.unidades DESC
-LIMIT 5;
+SELECT uEmpleados.nombre AS nombreEmpleado,
+pedidos.fechaRealizacion,
+uClientes.nombre AS nombreCliente
+FROM pedidos 
+JOIN empleados ON pedidos.empleadoId=empleados.id
+JOIN usuarios AS uEmpleados ON uEmpleados.id=empleados.usuarioId
+JOIN clientes ON pedidos.clienteId=clientes.id
+JOIN usuarios as uClientes ON uClientes.id=clientes.usuarioId
+WHERE MONTH (pedidos.fechaRealizacion)=MONTH(CURDATE());
 
--- 2.3
-SELECT usuarios.nombre,pedidos.fechaRealizacion,sum(lineaspedido.precio*lineaspedido.unidades) AS preciototal,lineaspedido.unidades
-FROM usuarios 
-JOIN empleados ON empleados.usuarioId=usuarios.id
-RIGHT JOIN pedidos ON empleados.id=pedidos.empleadoId
-JOIN lineaspedido ON lineaspedido.pedidoId=pedidos.id
-GROUP BY pedidos.id
-HAVING TIMESTAMPDIFF(DAY,pedidos.fechaRealizacion,CURDATE())>=7;
+SELECT usuarios.nombre,SUM(lineaspedido.unidades),
+SUM(lineaspedido.unidades*lineaspedido.precio)
+FROM pedidos 
+JOIN lineaspedido ON pedidos.id=lineaspedido.pedidoId
+JOIN clientes ON pedidos.clienteId=clientes.id
+JOIN usuarios ON usuarios.id=clientes.usuarioId
+WHERE YEAR (pedidos.fechaRealizacion)=2024
+GROUP BY clientes.id
+HAVING COUNT(DISTINCT(pedidos.id))>5;
+

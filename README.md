@@ -1,4 +1,4 @@
-# Enunciado Evaluación Individual de Laboratorio - Modelo C
+# Enunciado Evaluación Individual de Laboratorio - Modelo B
 **Si usted entrega sin haber sido verificada su identidad no podrá ser evaluado.**
 
 ## Tienda Online
@@ -15,27 +15,28 @@ Realice los siguientes ejercicios:
 
 Incluya su solución en el fichero `1.solucionCreacionTabla.sql`.
 
-Necesitamos conocer la opinión de nuestros clientes sobre nuestros productos. Para ello se propone la creación de una nueva tabla llamada `Valoraciones`. Cada valoración versará sobre un producto y será realizada por un solo cliente. Cada producto podrá ser valorado por muchos clientes. Cada cliente podrá realizar muchas valoraciones. Un cliente no puede valorar más de una vez un mismo producto.
 
-Para cada valoración necesitamos conocer la puntuación de 1 a 5 (sólo se permiten enteros) y la fecha en que se realiza la valoración.
+Necesitamos conocer los pagos que se realicen sobre los pedidos. Para ello se propone la creación de una nueva tabla llamada `Pagos`. Cada pedido podrá tener asociado varios pagos y cada pago solo corresponde con un pedido en concreto.
+
+Para cada pago necesitamos conocer la fecha de pago, la cantidad pagada (que no puede ser negativa) y si el pago ha sido revisado o no (por defecto no estará revisado).
 
 ### 2. Consultas SQL (DQL). 3 puntos
 
 Incluya su solución en el fichero `2.solucionConsultas.sql`.
 
-#### 2.1. Devuelva el nombre del producto, el precio unitario y las unidades compradas para las 5 líneas de pedido con más unidades. (1 punto)
+#### 2.1. Devuelva el nombre del del empleado, la fecha de realización del pedido y el nombre del cliente de todos los pedidos realizados este mes. (1 puntos)
 
-#### 2.3. Devuelva el nombre del empleado, la fecha de realización del pedido, el precio total del pedido y las unidades totales del pedido para todos los pedidos que de más 7 días de antigüedad desde que se realizaron. Si un pedido no tiene asignado empleado, también debe aparecer en el listado devuelto. (2 puntos)
+#### 2.2. Devuelva el nombre, las unidades totales pedidas y el importe total gastado de aquellos clientes que han realizado más de 5 pedidos en el último año. (2 puntos)
 
-### 3. Procedimiento. Bonificar pedido retrasado. 3,5 puntos
+### 3. Procedimiento. 3,5 puntos
 
 Incluya su solución en el fichero `3.solucionProcedimiento.sql`.
 
-Cree un procedimiento que permita bonificar un pedido que se ha retrasado debido a la mala gestión del empleado a cargo. Recibirá un identificador de pedido, asignará a otro empleado como gestor y reducirá un 20% el precio unitario de cada línea de pedido asociada a ese pedido. (1,5 puntos)
+Cree un procedimiento que permita crear un nuevo producto con posibilidad de que sea para regalo. Si el producto está destinado a regalo se creará un pedido con ese producto y costes 0€ para el cliente más antiguo. (1,5 puntos)
 
-Asegure que el pedido estaba asociado a un empleado y en caso contrario lance excepción con el siguiente mensaje: (1 punto)
+Asegure que el precio del producto para regalo no debe superar los 50 euros y lance excepción si se da el caso con el siguiente mensaje: (1 punto)
 
-`El pedido no tiene gestor`.
+`No se permite crear un producto para regalo de más de 50€`.
 
 Garantice que o bien se realizan todas las operaciones o bien no se realice ninguna. (1 punto)
 
@@ -43,7 +44,7 @@ Garantice que o bien se realizan todas las operaciones o bien no se realice ning
 
 Incluya su solución en el fichero `4.solucionTrigger.sql`.
 
-Cree un trigger llamado `p_limitar_unidades_mensuales_de_productos_fisicos` que, a partir de este momento, impida la venta de más de 1000 unidades al mes de cualquier producto físico.
+Cree un trigger llamado `t_limitar_importe_pedidos_de_menores` que impida que, a partir de ahora, los pedidos realizados por menores superen los 500€.
 
 ## Procedimiento de entrega:
 

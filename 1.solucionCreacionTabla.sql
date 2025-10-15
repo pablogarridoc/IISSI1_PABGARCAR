@@ -1,14 +1,10 @@
-DROP TABLE IF EXISTS Valoraciones;
+DROP TABLE IF EXISTS Pagos;
 
-CREATE TABLE Valoraciones (
+CREATE TABLE Pagos (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    clienteId INT NOT NULL,
-    productoId INT NOT NULL,
-    puntuacion INT NOT NULL CHECK (puntuacion>=1 AND puntuacion<=5),
-    fechaValoracion DATE NOT NULL,
-    UNIQUE(clienteId,productoId),
-    FOREIGN KEY (clienteId) REFERENCES clientes(id),
-    FOREIGN KEY (productoId) REFERENCES Productos(id)
-	 	ON DELETE CASCADE 
-		ON UPDATE CASCADE
+    pedidoId INT NOT NULL,
+    fechaPago DATE NOT NULL,
+    cantidadPago DECIMAL(10, 2) NOT NULL CHECK (cantidadPago>0),
+    revisado BOOL NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (pedidoId) REFERENCES Pedidos(id)
 );
